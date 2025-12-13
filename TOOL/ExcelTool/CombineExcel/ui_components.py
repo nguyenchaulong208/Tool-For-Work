@@ -1,10 +1,10 @@
 import streamlit as st
 
 def upload_files():
-    return st.file_uploader("Chọn file Excel", type=["xlsx"], accept_multiple_files=True)
+    return st.file_uploader("📂 Chọn file Excel", type=["xlsx"], accept_multiple_files=True)
 
 def select_sheets(file, sheets):
-    return st.multiselect(f"Chọn sheet trong {file.name}", sheets, key=f"{file.name}_sheets")
+    return st.multiselect(f"📑 Chọn sheet trong {file.name}", sheets, key=f"{file.name}_sheets")
 
 def edit_dataframe(df, sheet, file):
     st.markdown(f"#### Sheet: {sheet}")
@@ -13,7 +13,7 @@ def edit_dataframe(df, sheet, file):
     # Xoá cột
     cols = list(edited_df.columns)
     cols_to_drop = st.multiselect(
-        f"Chọn cột muốn xoá khỏi {sheet}",
+        f"🧹 Chọn cột muốn xoá khỏi {sheet}",
         cols,
         key=f"{file.name}_{sheet}_dropcols"
     )
@@ -24,7 +24,7 @@ def edit_dataframe(df, sheet, file):
 
     # Dòng bắt đầu gộp
     start_row = st.number_input(
-        f"Gộp từ dòng số trong {sheet}:",
+        f"🔢 Gộp từ dòng số trong {sheet}:",
         min_value=1,
         value=1,
         key=f"{file.name}_{sheet}_start"
