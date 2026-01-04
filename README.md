@@ -179,34 +179,25 @@ flowchart TD
 ## 4. Luồng xử lý tổng thể
 
 ```mermaid
-sequenceDiagram
-    participant User
-    participant App as app.py
-    participant Setup as setup.py
-    participant Req as check_RequirementsFile.py
-    participant WF as workflow.py
-    participant Merge as data_operations.py
-    participant Form as form_handler.py
-    participant Log as logger.py
+flowchart TD
 
-    User->>App: Chạy ứng dụng
-    App->>Log: init_logger()
-    App->>Setup: init_environment()
-    Setup->>Req: install_missing()
-    Req-->>Setup: Hoàn tất kiểm tra
+    A[Start] --> B[Load Config]
+    B --> C[Init Logger]
+    C --> D[Check Required Folders]
 
-    App->>WF: run_workflow()
+    D --> E[Get Input File List]
 
-    WF->>User: Upload file
-    User->>WF: Chọn sheet, chỉnh sửa
+    E --> F{For each file?}
+    F -->|Yes| G[Read File]
+    G --> H[Process Content]
+    H --> I[Write Output]
+    I --> F
 
-    WF->>Merge: merge_data()
-    Merge-->>WF: Trả về DataFrame gộp
+    F -->|No| J[Optional: Aggregate Results]
 
-    WF->>Form: save_with_form_dynamic_by_index()
-    Form-->>WF: Xuất file Excel
-
-    WF->>User: Cho tải file
+    J --> K[Export Final Output]
+    K --> L[Cleanup Temp Files]
+    L --> M[End]
 ```
 
 ---
