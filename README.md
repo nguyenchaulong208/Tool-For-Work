@@ -6,38 +6,228 @@ Dự án này tập hợp các công cụ hỗ trợ xử lý dữ liệu nội 
 ## Các chức năng chính
 
 ### 1. Gộp file Excel
-*(Tạm thời bỏ trống – sẽ cập nhật sau)*
+
+# 📘 Excel Combine Tool
+
+## 1. Giới thiệu
+
+**Excel Combine Tool** là ứng dụng Streamlit hỗ trợ:
+
+- Upload nhiều file Excel  
+- Chọn sheet, chỉnh sửa dữ liệu  
+- Gộp dữ liệu từ nhiều file/sheet  
+- Xuất file Excel mới hoặc ghi vào form có sẵn  
+- Ghi log realtime trên giao diện web  
+- Tự động kiểm tra & cài đặt thư viện  
+
+Ứng dụng được chia thành nhiều module nhỏ để dễ bảo trì và mở rộng.
 
 ---
 
-### 2. Phân chia hạch toán chi phí lương
-- **Nguồn dữ liệu**:
-  - File Excel danh sách nhân viên (chứa thông tin: mã nhân viên, tên, phòng ban, chức vụ).
-  - File Excel lương nhân viên từng tháng.
-- **Quy trình xử lý**:
-  1. Đọc dữ liệu từ file danh sách nhân viên.
-  2. Đọc dữ liệu từ file lương nhân viên theo tháng.
-  3. Match dữ liệu lương với danh sách nhân viên dựa trên mã nhân viên.
-  4. Phân chia chi phí lương theo phòng ban.
-- **Đầu ra**:
-  - File Excel tổng hợp chi phí lương theo phòng ban.
-  - Báo cáo chi phí lương từng tháng.
+## 2. Kiến trúc tổng quan
+
+### 🧩 Sơ đồ kiến trúc (Mermaid)
+
+```mermaid
+flowchart TD
+
+    A[app.py<br>Điểm khởi động] --> B[setup.py<br>Khởi tạo môi trường]
+    B --> C[check_RequirementsFile.py<br>Kiểm tra & cài đặt thư viện]
+
+    A --> D[workflow.py<br>Luồng xử lý chính]
+
+    D --> E[ui_components.py<br>UI nhập liệu]
+    D --> F[file_preview.py<br>Xem trước sheet]
+    D --> G[data_operations.py<br>Gộp dữ liệu]
+    D --> H[form_handler.py<br>Ghi dữ liệu vào form Excel]
+    D --> I[logger.py<br>Ghi log realtime]
+
+    H --> J[form_utils.py<br>Xử lý style & merged cell]
+    D --> K[file_merger.py<br>Gộp & lưu file Excel]
+    D --> L[file_io.py<br>Lưu & tải file]
+    D --> M[temp_manager.py<br>Quản lý file tạm]
+
+    A --> N[layout.py<br>Cấu hình giao diện]
+```
 
 ---
 
-### 3. Kiểm tra sai sót file Excel tính lương
-- **Mục tiêu**:
-  - Phát hiện các lỗi thường gặp trong file lương (ví dụ: nhân viên thiếu thông tin, dữ liệu trùng lặp, sai mã nhân viên).
-  - Đưa ra cảnh báo hoặc báo cáo lỗi để người dùng chỉnh sửa.
-- **Đầu ra**:
-  - File báo cáo lỗi hoặc log chi tiết.
-  - Danh sách nhân viên có dữ liệu bất thường.
+## 3. Mô tả từng module
+
+### 📌 app.py – Điểm khởi động chính
+
+- Khởi tạo giao diện Streamlit  
+- Khởi tạo logger  
+- Kiểm tra môi trường  
+- Gọi workflow chính  
+
+**Hàm chính:**
+
+| Hàm | Chức năng |
+|-----|-----------|
+| `main()` | Điều phối toàn bộ ứng dụng |
 
 ---
 
-## Yêu cầu hệ thống
-- Python 3.9+
-- Các thư viện:
-  - `pandas`
-  - `openpyxl`
-  - `xlrd`
+### 📌 logger.py – Hệ thống log realtime
+
+- Tạo vùng log cố định  
+- Ghi log theo thời gian thực  
+- Không in ra CMD  
+- Dễ mở rộng  
+
+**Hàm chính:**
+
+| Hàm | Chức năng |
+|-----|-----------|
+| `init_logger()` | Tạo vùng log |
+| `log(msg)` | Ghi log |
+| `clear_log()` | Xóa log |
+
+---
+
+### 📌 setup.py – Khởi tạo môi trường
+
+- Gọi hàm kiểm tra thư viện
+
+---
+
+### 📌 check_RequirementsFile.py – Kiểm tra & cài đặt thư viện
+
+- Đọc requirements.txt  
+- Kiểm tra thư viện đã cài chưa  
+- Tự động cài đặt nếu thiếu  
+- Xử lý đặc biệt cho pywin32  
+
+---
+
+### 📌 workflow.py – Luồng xử lý chính
+
+- Upload file  
+- Chọn sheet  
+- Chỉnh sửa dữ liệu  
+- Xem trước form  
+- Nhập dòng bắt đầu/kết thúc  
+- Gộp dữ liệu  
+- Ghi vào form  
+
+---
+
+### 📌 ui_components.py – Thành phần UI tái sử dụng
+
+- Upload file  
+- Chọn sheet  
+- Chỉnh sửa dataframe  
+
+---
+
+### 📌 file_preview.py – Xem trước dữ liệu
+
+- Lấy danh sách sheet  
+- Đọc sheet thành DataFrame  
+
+---
+
+### 📌 data_operations.py – Gộp dữ liệu
+
+- Gộp dữ liệu từ nhiều file/sheet  
+- Áp dụng dòng bắt đầu  
+- Áp dụng chọn cột  
+
+---
+
+### 📌 file_merger.py – Gộp & lưu file Excel
+
+- Gộp dữ liệu từ nhiều file  
+- Lưu file Excel  
+
+---
+
+### 📌 file_io.py – Lưu file & tải xuống
+
+- Lưu file Excel  
+- Tải file xuống  
+- Ghi dữ liệu vào form bằng openpyxl  
+
+---
+
+### 📌 form_handler.py – Ghi dữ liệu vào form Excel bằng COM
+
+- Kiểm tra & cài đặt pywin32  
+- Mở Excel thật bằng COM  
+- Xóa vùng body  
+- Chèn dòng  
+- Ghi dữ liệu  
+- Lưu file  
+
+---
+
+### 📌 form_utils.py – Xử lý style & merged cell
+
+- Copy style dòng  
+- Ghi giá trị vào merged cell  
+
+---
+
+### 📌 temp_manager.py – Quản lý file tạm
+
+- Tạo file tạm  
+- Xóa file tạm  
+
+---
+
+### 📌 layout.py – Cấu hình giao diện
+
+- Set page config  
+- Tiêu đề ứng dụng  
+
+---
+
+## 4. Luồng xử lý tổng thể
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant App as app.py
+    participant Setup as setup.py
+    participant Req as check_RequirementsFile.py
+    participant WF as workflow.py
+    participant Merge as data_operations.py
+    participant Form as form_handler.py
+    participant Log as logger.py
+
+    User->>App: Chạy ứng dụng
+    App->>Log: init_logger()
+    App->>Setup: init_environment()
+    Setup->>Req: install_missing()
+    Req-->>Setup: Hoàn tất kiểm tra
+
+    App->>WF: run_workflow()
+
+    WF->>User: Upload file
+    User->>WF: Chọn sheet, chỉnh sửa
+
+    WF->>Merge: merge_data()
+    Merge-->>WF: Trả về DataFrame gộp
+
+    WF->>Form: save_with_form_dynamic_by_index()
+    Form-->>WF: Xuất file Excel
+
+    WF->>User: Cho tải file
+```
+
+---
+
+## 5. Ghi chú bảo trì
+
+- Không sửa `logger.py` nếu không cần  
+- Nếu thay đổi UI → sửa `workflow.py` và `ui_components.py`  
+- Nếu thay đổi logic gộp → sửa `data_operations.py`  
+- Nếu thay đổi cách ghi form → sửa `form_handler.py`  
+- Nếu thêm thư viện → cập nhật `requirements.txt`  
+
+Xem hướng dẫn sử dụng tại: [User Guide](Documents/USER_GUIDE.md)
+---
+
+
+
