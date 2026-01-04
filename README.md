@@ -1,7 +1,7 @@
-# Project Tool Công Việc
+# Project Tool Cho Công Việc
 
 ## Giới thiệu
-Dự án này tập hợp các công cụ hỗ trợ xử lý dữ liệu nội bộ, đặc biệt liên quan đến quản lý và hạch toán chi phí lương. Các chức năng được thiết kế để tự động hóa quy trình, giảm sai sót và tiết kiệm thời gian.
+Dự án này tập hợp các công cụ hỗ trợ xử lý dữ liệu. Các chức năng được thiết kế để tự động hóa quy trình, giảm sai sót và tiết kiệm thời gian.
 
 ## Các chức năng chính
 
