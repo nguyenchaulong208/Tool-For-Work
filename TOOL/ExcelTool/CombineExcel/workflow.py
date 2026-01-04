@@ -2,9 +2,10 @@ import streamlit as st
 import file_preview
 from ui_components import upload_files, select_sheets, edit_dataframe
 from data_operations import merge_data
-from file_io import save_and_download
-from form_handler import preview_form_sheet, save_with_form_dynamic_by_index
-from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
+from form_handler import save_with_form_dynamic_by_index
+import pandas as pd
+from openpyxl import load_workbook
+from logger import log
 
 def run_workflow():
     uploaded_files = upload_files()
@@ -13,6 +14,7 @@ def run_workflow():
         st.markdown("### Thiết lập gộp dữ liệu")
         selections = []
 
+        # Chọn file nguồn để gộp
         for f in uploaded_files:
             with st.expander(f"Thiết lập cho: {f.name}", expanded=False):
                 sheets = file_preview.get_sheets(f)
@@ -36,82 +38,55 @@ def run_workflow():
         st.markdown("---")
         st.markdown("### Gộp và xuất file")
 
+        # Tên file xuất
         output_name = st.text_input("Tên file xuất (xlsx)", value="merged_result.xlsx")
 
+        # Chọn file form
         form_choice = st.selectbox("Chọn file làm form", [f.name for f in uploaded_files])
         form_file = next(f for f in uploaded_files if f.name == form_choice)
+
+        # Chọn sheet form
         form_sheets = file_preview.get_sheets(form_file)
         form_sheet_choice = st.selectbox("Chọn sheet trong form", form_sheets)
 
-        df_preview = preview_form_sheet(form_file, sheet_name=form_sheet_choice)
-        df_preview.reset_index(inplace=True)  # thêm cột "index" để lấy dòng
+        # -----------------------------
+        # HIỂN THỊ FORM MẪU ĐỂ XEM TRƯỚC
+        # -----------------------------
+        st.markdown("### 📄 Xem trước form mẫu (để xác định dòng bắt đầu – kết thúc)")
 
-        gb = GridOptionsBuilder.from_dataframe(df_preview)
-        gb.configure_selection(selection_mode="multiple", use_checkbox=True)  # tick chọn bằng checkbox
-        grid_options = gb.build()
+        wb = load_workbook(form_file, data_only=True)
+        ws = wb[form_sheet_choice]
+        data = list(ws.values)
+        df_form_preview = pd.DataFrame(data)
+        df_form_preview.insert(0, "Dòng số", range(1, len(df_form_preview) + 1))
+        st.dataframe(df_form_preview, height=500)
 
-        st.subheader("📊 Tick chọn nhanh bằng checkbox")
-        grid_response = AgGrid(
-            df_preview,
-            gridOptions=grid_options,
-            update_mode=GridUpdateMode.SELECTION_CHANGED,
-            fit_columns_on_grid_load=True
-        )
+        st.info("👆 Hãy xem số dòng trong bảng trên rồi nhập dòng bắt đầu và kết thúc bên dưới")
 
-        # Lấy index các dòng đã chọn
-        selected_rows = []
-        selected_data = grid_response.get("selected_rows", [])
-        if isinstance(selected_data, list):
-            for r in selected_data:
-                if isinstance(r, dict) and "index" in r:
-                    selected_rows.append(r["index"])
+        # Nhập vùng dữ liệu
+        start_row = st.number_input("Dòng bắt đầu vùng dữ liệu", min_value=1, value=10)
+        end_row = st.number_input("Dòng kết thúc vùng dữ liệu", min_value=start_row, value=start_row + 10)
 
-        # Gán vùng
-        region_type = st.radio("Gán vùng cho dòng đã chọn", ["Header", "Body", "Footer"])
-        if st.button("Gán vùng"):
-            if selected_rows:
-                if region_type == "Header":
-                    st.session_state["header_rows"] = selected_rows
-                elif region_type == "Body":
-                    st.session_state["body_rows"] = selected_rows
-                elif region_type == "Footer":
-                    st.session_state["footer_rows"] = selected_rows
-                st.success(f"✅ Đã gán {len(selected_rows)} dòng vào vùng {region_type}")
-            else:
-                st.warning("⚠️ Bạn chưa tick dòng nào để gán vùng")
+        # Cột bắt đầu ghi dữ liệu
+        body_start_col = st.number_input("Cột bắt đầu ghi dữ liệu", min_value=1, value=1)
 
-        # Hiển thị vùng đã gán
-        st.write("Header:", st.session_state.get("header_rows", []))
-        st.write("Body:", st.session_state.get("body_rows", []))
-        st.write("Footer:", st.session_state.get("footer_rows", []))
-
-        # Nút clear vùng
-        if st.button("Clear Header"):
-            st.session_state["header_rows"] = []
-            st.info("Đã xoá vùng Header")
-        if st.button("Clear Body"):
-            st.session_state["body_rows"] = []
-            st.info("Đã xoá vùng Body")
-        if st.button("Clear Footer"):
-            st.session_state["footer_rows"] = []
-            st.info("Đã xoá vùng Footer")
-
-        body_start_col = st.number_input("Cột bắt đầu body", min_value=1, value=1)
-
+        # -----------------------------
+        # GỘP FILE
+        # -----------------------------
         if st.button("Gộp file"):
             try:
                 merged = merge_data(selections, st.session_state, file_preview)
+
                 st.subheader("Kết quả gộp")
-                st.dataframe(merged)  # hiển thị toàn bộ dữ liệu
+                st.dataframe(merged)
 
                 save_with_form_dynamic_by_index(
                     merged=merged,
                     form_file=form_file,
                     output_name=output_name,
                     sheet_name=form_sheet_choice,
-                    header_rows=st.session_state.get("header_rows", []),
-                    body_rows=st.session_state.get("body_rows", []),
-                    footer_rows=st.session_state.get("footer_rows", []),
+                    start_row=start_row,
+                    end_row=end_row,
                     body_start_col=body_start_col
                 )
 

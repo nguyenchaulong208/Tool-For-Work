@@ -1,67 +1,166 @@
 import pandas as pd
 from io import BytesIO
 import streamlit as st
-from openpyxl import load_workbook
-from form_utils import copy_row_style, write_row_values
+import subprocess
+import sys
+import site
+import os
+import datetime
+import time
 
-def preview_form_sheet(form_file, sheet_name=None):
-    """Chuyển sheet form thành DataFrame để hiển thị preview có checkbox."""
-    wb = load_workbook(form_file, data_only=True)
-    ws = wb[sheet_name] if sheet_name else wb.active
-    data = list(ws.values)
-    df_preview = pd.DataFrame(data)
-    # thêm cột checkbox để chọn dòng
-    df_preview["Chọn dòng"] = False
-    return df_preview
+from logger import log   # <--- TÍCH HỢP LOG
+
+def run_workflow():
+    log("▶ Bắt đầu workflow...")
+
+
+def normalize_value(v):
+    if isinstance(v, datetime.time):
+        return v.strftime("%H:%M")
+    if isinstance(v, datetime.datetime):
+        return v.strftime("%Y-%m-%d %H:%M")
+    if isinstance(v, datetime.date):
+        return v.strftime("%Y-%m-%d")
+    return v
+
+
+def ensure_pywin32():
+    try:
+        import win32com.client
+        import pythoncom
+        log("✔ pywin32 đã có sẵn")
+        return True
+    except ImportError:
+        log("🔧 pywin32 chưa có, đang cài đặt...")
+
+    try:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "pywin32"])
+        log("✔ Cài đặt pywin32 thành công")
+    except Exception as e:
+        log(f"❌ Không thể cài pywin32: {e}")
+        return False
+
+    try:
+        site_packages = site.getsitepackages()[0]
+        postinstall = os.path.join(site_packages, "pywin32_system32", "pywin32_postinstall.py")
+
+        if os.path.exists(postinstall):
+            log("🔧 Đang chạy postinstall...")
+            subprocess.check_call([sys.executable, postinstall, "-install"])
+            log("✔ Hoàn tất postinstall")
+    except Exception as e:
+        log(f"⚠ Lỗi khi chạy postinstall: {e}")
+
+    try:
+        import win32com.client
+        import pythoncom
+        log("✔ pywin32 đã sẵn sàng")
+        return True
+    except ImportError:
+        log("❌ Không thể import win32com sau khi cài")
+        return False
+
 
 def save_with_form_dynamic_by_index(
     merged,
     form_file,
     output_name,
     sheet_name,
-    header_rows,
-    body_rows,
-    footer_rows,
+    start_row,
+    end_row,
     body_start_col=1
 ):
-    wb = load_workbook(form_file)
-    ws = wb[sheet_name]
+    if not ensure_pywin32():
+        log("❌ Không thể khởi tạo pywin32. Dừng xử lý.")
+        return
+
+    import win32com.client as win32
+    import pythoncom
+
+    pythoncom.CoInitialize()
 
     merged = merged.fillna("")
     body_data = merged.values.tolist()
     rows_needed = len(body_data)
-    rows_available = len(body_rows)
 
-    # Nếu thiếu dòng → chèn trước dòng đầu footer
-    if rows_needed > rows_available:
-        insert_at = min(footer_rows) if footer_rows else ws.max_row
-        ws.insert_rows(insert_at, amount=rows_needed - rows_available)
-        style_model_row = body_rows[0] if body_rows else (header_rows[-1] if header_rows else 1)
-        max_col = body_start_col + len(merged.columns) - 1
-        for r in range(insert_at, insert_at + (rows_needed - rows_available)):
-            copy_row_style(ws, style_model_row, r, max_col)
-        body_rows += list(range(insert_at, insert_at + (rows_needed - rows_available)))
+    start_row = int(start_row)
+    end_row = int(end_row)
+    region_size = end_row - start_row + 1
 
-    # Nếu thừa dòng → xoá từ cuối body
-    elif rows_needed < rows_available:
-        rows_to_delete = rows_available - rows_needed
-        delete_at = body_rows[-rows_to_delete]
-        ws.delete_rows(delete_at, amount=rows_to_delete)
-        body_rows = body_rows[:-rows_to_delete]
+    temp_path = os.path.join(os.getcwd(), f"_temp_form_{int(time.time())}.xlsx")
+    with open(temp_path, "wb") as f:
+        f.write(form_file.getvalue())
 
-    # Ghi dữ liệu vào vùng body
-    for i, row_values in enumerate(body_data):
-        write_row_values(ws, body_rows[i], body_start_col, row_values)
+    save_path = os.path.join(os.getcwd(), output_name)
 
-    wb.save(output_name)
-    st.success(f"✅ Đã tạo file mới dựa trên form: {output_name}")
+    excel = win32.Dispatch("Excel.Application")
+    excel.Visible = False
+    wb = None
 
-    buffer = BytesIO()
-    wb.save(buffer)
-    buffer.seek(0)
-    st.download_button(
-        label="📥 Tải file kết quả (giữ header/footer form)",
-        data=buffer.getvalue(),
-        file_name=output_name,
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    )
+    try:
+        log("📄 Đang mở file Excel mẫu...")
+        wb = excel.Workbooks.Open(temp_path)
+        ws = wb.Worksheets(sheet_name)
+
+        log("🧹 Xóa dữ liệu cũ trong vùng body...")
+        ws.Range(
+            ws.Cells(start_row, 1),
+            ws.Cells(end_row, ws.UsedRange.Columns.Count)
+        ).ClearContents()
+
+        if rows_needed > region_size:
+            rows_to_add = rows_needed - region_size
+            insert_at = start_row + 1
+            log(f"➕ Chèn thêm {rows_to_add} dòng...")
+            ws.Rows(f"{insert_at}:{insert_at + rows_to_add - 1}").Insert()
+
+        log("✍️ Đang ghi dữ liệu vào form...")
+        for i, row_values in enumerate(body_data):
+            for j, value in enumerate(row_values):
+                ws.Cells(start_row + i, body_start_col + j).Value = normalize_value(value)
+
+        log("💾 Đang lưu file kết quả...")
+        wb.SaveAs(save_path)
+        log("✔ Lưu file thành công!")
+
+    except Exception as e:
+        log(f"❌ Lỗi khi gộp: {e}")
+
+    finally:
+        try:
+            if wb is not None:
+                wb.Close(SaveChanges=0)
+        except:
+            pass
+
+        try:
+            excel.Quit()
+        except:
+            pass
+
+        try:
+            pythoncom.CoUninitialize()
+        except:
+            pass
+
+        try:
+            os.remove(temp_path)
+        except:
+            pass
+
+    try:
+        with open(save_path, "rb") as f:
+            file_bytes = f.read()
+
+        st.success(f"✔ Đã tạo file: {output_name}")
+
+        st.download_button(
+            label="📥 Tải file kết quả",
+            data=file_bytes,
+            file_name=output_name,
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+    except Exception as e:
+        log(f"❌ Không thể tải file: {e}")
+        
+    log("✅ Kết thúc workflow.")
