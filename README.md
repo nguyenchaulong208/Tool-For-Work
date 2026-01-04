@@ -43,7 +43,6 @@ flowchart TD
     D --> I[logger.py<br>Ghi log realtime]
 
     H --> J[form_utils.py<br>Xử lý style & merged cell]
-    D --> K[file_merger.py<br>Gộp & lưu file Excel]
     D --> L[file_io.py<br>Lưu & tải file]
     D --> M[temp_manager.py<br>Quản lý file tạm]
 
@@ -136,12 +135,6 @@ flowchart TD
 
 ---
 
-### 📌 file_merger.py – Gộp & lưu file Excel
-
-- Gộp dữ liệu từ nhiều file  
-- Lưu file Excel  
-
----
 
 ### 📌 file_io.py – Lưu file & tải xuống
 

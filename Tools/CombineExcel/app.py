@@ -1,6 +1,6 @@
 import streamlit as st
 
-from logger import init_logger, log, clear_log
+from logger import init_logger, log
 
 import setup
 from workflow import run_workflow
