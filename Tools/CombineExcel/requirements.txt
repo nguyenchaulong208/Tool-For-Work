@@ -1,4 +1,5 @@
-# Các thư viện chính cho Excel Tool
+# Các thư viện chính/Gói cài đặt cho Excel Tool
+python_version == "3.12"
 streamlit
 pandas
 openpyxl
