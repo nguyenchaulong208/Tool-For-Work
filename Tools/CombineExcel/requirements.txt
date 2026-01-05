@@ -4,4 +4,3 @@ pandas
 openpyxl
 setuptools
 xlrd
-st_aggrid
