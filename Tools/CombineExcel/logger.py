@@ -17,7 +17,7 @@ def init_logger():
             font-size: 14px;
             white-space: pre-wrap;
             overflow-y: auto;
-            height: 300px;
+            height: 100px;
         }
         </style>
         <script>
