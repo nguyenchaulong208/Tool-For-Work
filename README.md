@@ -214,7 +214,8 @@ Xem hướng dẫn sử dụng tại: [User Guide](Documents/USER_GUIDE.md)
 ---
 
 
-```flowchart TD
+```mermaid
+flowchart TD
     A([BẮT ĐẦU]) --> B[Nhân viên lập đề nghị<br/>tạm ứng / thanh toán]
 
     B --> C{Thông tin đủ<br/>& không nợ quá hạn?}
