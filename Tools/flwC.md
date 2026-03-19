@@ -1,16 +1,30 @@
 flowchart TD
-  A[Nhân viên: Lập phiếu đề nghị] -->|Gửi đề nghị| B[Hệ thống AIS: Module Đề nghị (Document)]
-  B --> C{Trưởng phòng Vận hành kiểm tra}
-  C -- Hợp lý --> D[Hệ thống AIS: Ghi nhận duyệt hạn mức]
-  C -- Không hợp lý --> E[Trả về Nhân viên để chỉnh sửa]
-  D --> F[Kế toán (Tổng hợp): Kiểm tra chứng từ & số dư tạm ứng]
-  F --> G{Số dư OK và chứng từ hợp lệ?}
-  G -- Có --> H[CEO: Phê duyệt nếu vượt hạn mức hoặc chi quản trị]
-  G -- Không --> E
-  H --> I[Kế toán (Thực chi): Lập phiếu chi / ủy nhiệm chi]
-  I --> J[Ngân hàng: Duyệt lệnh chuyển khoản]
-  J --> K[Ngân hàng: Thực hiện chuyển khoản]
-  K --> L[Nhân viên nhận tiền]
-  L --> M[Nhân viên: Nộp chứng từ gốc (Hoàn ứng)]
-  M --> N[Kế toán: Quyết toán chênh lệch; Cập nhật sổ AIS]
-  N --> O[Kho lưu trữ AIS: Lưu chứng từ & báo cáo]
+    A([BẮT ĐẦU]) --> B[Nhân viên lập đề nghị<br/>tạm ứng / thanh toán]
+
+    B --> C{Thông tin đủ<br/>& không nợ quá hạn?}
+    C -- Không --> C1[ TỪ CHỐI / TRẢ LẠI ]
+    C -- Có --> D[Trưởng phòng vận hành<br/>kiểm tra hợp lý theo Tariff]
+
+    D --> E{Hợp lý theo<br/>hạn mức chi?}
+    E -- Không --> E1[ TỪ CHỐI ]
+    E -- Có --> F[Kế toán kiểm tra<br/>chứng từ & số dư nợ cũ]
+
+    F --> G{Đạt chuẩn<br/>& không nợ?}
+    G -- Không --> G1[ TRẢ LẠI ]
+    G -- Có --> H[Giám đốc điều hành<br/>phê duyệt chủ trương]
+
+    H --> I{Phê duyệt<br/>chủ trương chi?}
+    I -- Không --> I1[ DỪNG QUY TRÌNH ]
+    I -- Có --> J[Kế toán thực chi<br/>Phiếu chi / Ủy nhiệm chi]
+
+    J --> K{Thông tin UNC / phiếu chi<br/>chính xác?}
+    K -- Không --> K1[ Sửa lại thông tin ]
+    K -- Có --> L[Duyệt lệnh ngân hàng]
+
+    L --> M{Duyệt lệnh<br/>chuyển khoản?}
+    M -- Không --> M1[ DỪNG QUY TRÌNH ]
+    M -- Có --> N[Nhân viên nộp chứng từ gốc<br/>3–5 ngày]
+
+    N --> O[Kế toán quyết toán chênh lệch]
+    O --> P[Lưu hồ sơ kế toán]
+    P --> Q([KẾT THÚC])
