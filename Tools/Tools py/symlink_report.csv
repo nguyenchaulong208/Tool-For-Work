@@ -1,0 +1,28 @@
+type,path,target
+file,C:\$Recycle.Bin\S-1-5-21-2498450708-3366444913-1221667513-1001\$ROE9A3J,\\?\F:\DataUser\Brave-Browser
+file,C:\Program Files\Microsoft Office\root\Client\AppvIsvSubsystems32.dll,\\?\C:\Program Files\Common Files\Microsoft Shared\ClickToRun\AppvIsvSubsystems32.dll
+file,C:\Program Files\Microsoft Office\root\Client\AppvIsvSubsystems64.dll,\\?\C:\Program Files\Common Files\Microsoft Shared\ClickToRun\AppvIsvSubsystems64.dll
+file,C:\Program Files\Microsoft Office\root\Client\C2R32.dll,\\?\C:\Program Files\Common Files\Microsoft Shared\ClickToRun\C2R32.dll
+file,C:\Program Files\Microsoft Office\root\Client\C2R64.dll,\\?\C:\Program Files\Common Files\Microsoft Shared\ClickToRun\C2R64.dll
+file,C:\Program Files\Microsoft Office\root\Office16\AppvIsvSubsystems32.dll,\\?\C:\Program Files\Common Files\Microsoft Shared\ClickToRun\AppvIsvSubsystems32.dll
+file,C:\Program Files\Microsoft Office\root\Office16\AppvIsvSubsystems64.dll,\\?\C:\Program Files\Common Files\Microsoft Shared\ClickToRun\AppvIsvSubsystems64.dll
+file,C:\Program Files\Microsoft Office\root\Office16\C2R32.dll,\\?\C:\Program Files\Common Files\Microsoft Shared\ClickToRun\C2R32.dll
+file,C:\Program Files\Microsoft Office\root\Office16\C2R64.dll,\\?\C:\Program Files\Common Files\Microsoft Shared\ClickToRun\C2R64.dll
+file,C:\Program Files\Microsoft Office\root\vfs\ProgramFilesCommonX64\Microsoft Shared\Office16\AppvIsvSubsystems32.dll,\\?\C:\Program Files\Common Files\Microsoft Shared\ClickToRun\AppvIsvSubsystems32.dll
+file,C:\Program Files\Microsoft Office\root\vfs\ProgramFilesCommonX64\Microsoft Shared\Office16\AppvIsvSubsystems64.dll,\\?\C:\Program Files\Common Files\Microsoft Shared\ClickToRun\AppvIsvSubsystems64.dll
+file,C:\Program Files\Microsoft Office\root\vfs\ProgramFilesCommonX64\Microsoft Shared\Office16\C2R32.dll,\\?\C:\Program Files\Common Files\Microsoft Shared\ClickToRun\C2R32.dll
+file,C:\Program Files\Microsoft Office\root\vfs\ProgramFilesCommonX64\Microsoft Shared\Office16\C2R64.dll,\\?\C:\Program Files\Common Files\Microsoft Shared\ClickToRun\C2R64.dll
+file,C:\Program Files\Microsoft Office\root\vfs\ProgramFilesX86\Microsoft Office\Office16\AppvIsvSubsystems32.dll,\\?\C:\Program Files\Common Files\Microsoft Shared\ClickToRun\AppvIsvSubsystems32.dll
+file,C:\Program Files\Microsoft Office\root\vfs\ProgramFilesX86\Microsoft Office\Office16\AppvIsvSubsystems64.dll,\\?\C:\Program Files\Common Files\Microsoft Shared\ClickToRun\AppvIsvSubsystems64.dll
+file,C:\Program Files\Microsoft Office\root\vfs\ProgramFilesX86\Microsoft Office\Office16\C2R32.dll,\\?\C:\Program Files\Common Files\Microsoft Shared\ClickToRun\C2R32.dll
+file,C:\Program Files\Microsoft Office\root\vfs\ProgramFilesX86\Microsoft Office\Office16\C2R64.dll,\\?\C:\Program Files\Common Files\Microsoft Shared\ClickToRun\C2R64.dll
+file,C:\Program Files\NVIDIA Corporation\NvContainer\plugins\LocalSystem\messagebus.conf,\\?\C:\Program Files\NVIDIA Corporation\NVIDIA App\MessageBus\messagebus.conf
+file,C:\Program Files\NVIDIA Corporation\NvContainer\plugins\LocalSystem\NvMessageBusBroadcast.dll,\\?\C:\Program Files\NVIDIA Corporation\NVIDIA App\MessageBus\NvMessageBusBroadcast.dll
+directory,C:\Program Files\NVIDIA Corporation\NvContainer\plugins\Session\NvCpl,\\?\C:\Program Files\NVIDIA Corporation\NVIDIA App\NvCpl\Plugins\Session
+file,C:\Program Files\NVIDIA Corporation\NVIDIA App\CEF\plugins\NVIDIA Overlay\MessageBusRouter.dll,\\?\C:\Program Files\NVIDIA Corporation\NVIDIA App\CEF\PlugIns\NVIDIA App\MessageBusRouter.dll
+directory,C:\Users\All Users,\\?\C:\ProgramData
+directory,C:\Users\LONG\.lmstudio,\\?\D:\LONG\SymlinkData\.lmstudio
+file,C:\Users\LONG\.nuget\packages,\\?\F:\nuGetVisualStudio
+file,C:\Users\LONG\.vscode\extensions,\\?\F:\VSCodeExtensions
+directory,C:\Users\LONG\AppData\Local\Autodesk,\\?\D:\LONG\SymlinkData\Autodesk
+file,C:\Users\LONG\AppData\Local\Microsoft\Edge,\\?\F:\SymlinkData\Edge
